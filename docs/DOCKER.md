@@ -37,10 +37,11 @@ Thank you for trying out mist, all feedback is welcome 📢
 > The resource specifications are approximately what have been observed at initial setup and are the bare minimum
 
 > [!NOTE]
-> The original requirements specified "the latest stable Debian or Ubuntu" and "openssh-server". It should technically work on any Docker instance (x86/x64), however we have tested it at least runs on:
+> The original requirements specified "the latest stable Debian or Ubuntu" and "openssh-server". It should technically work on any Docker instance, however we have tested it at least runs on:
 > - Debian (Bookworm 12 (stable)) + Docker (version 28.1.1, build 4eba377) + Docker Compose (version v2.35.1)
 > - Alpine Linux (3.21.3) + Docker (27.3.1) + Docker Compose (2.31.0)
 > - Docker Desktop (Windows)
+> - Docker Desktop (macOS, Apple Silicon arm64) — several services run under Rosetta emulation; expect higher CPU usage. See the Troubleshooting section in [DEVELOPERS.md](./DEVELOPERS.md#troubleshooting) for arm64-specific fixes.
 
 > We aim to make this process simpler in the future.
 

@@ -16,8 +16,8 @@ SECRET_ID_PATH=/approle/secret_id
 
 if [ -f "$UNSEAL_TOKEN_PATH" ]; then
     echo "Unsealing vault"
-    socat STDIO 'EXEC:vault operator unseal,PTY' < $UNSEAL_TOKEN_PATH
-    socat STDIO 'EXEC:vault login,PTY' < $ROOT_TOKEN_PATH
+    vault operator unseal "$(cat $UNSEAL_TOKEN_PATH)"
+    export VAULT_TOKEN="$(cat $ROOT_TOKEN_PATH)"
     vault policy write mist /vault/policies/vault-mist.hcl
     vault write auth/approle/role/mist token_num_uses=0 token_policies=mist
     ROLE_ID=$(vault read auth/approle/role/mist/role-id -format=json |jq .data.role_id -r)
@@ -35,8 +35,13 @@ else
     export ROOT_TOKEN=$(cat $INIT_LOG | jq .root_token -r)
     echo "$ROOT_TOKEN" > "$ROOT_TOKEN_PATH"
     echo "$UNSEAL_TOKEN" > "$UNSEAL_TOKEN_PATH"
-    socat STDIO 'EXEC:vault operator unseal,PTY' < $UNSEAL_TOKEN_PATH
-    socat STDIO 'EXEC:vault login,PTY' < $ROOT_TOKEN_PATH
+    vault operator unseal "$UNSEAL_TOKEN"
+    export VAULT_TOKEN="$ROOT_TOKEN"
+    # Wait for vault to report unsealed+ready before proceeding
+    for i in $(seq 1 30); do
+        vault status >/dev/null 2>&1 && break
+        sleep 1
+    done
     vault secrets enable -path="kv1" kv
     vault policy write mist /vault/policies/vault-mist.hcl
     vault auth enable approle

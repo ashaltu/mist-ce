@@ -1,3 +1,3 @@
-FROM logstash:7.10.1
+FROM logstash:7.17.28
 
 COPY ./config /config-dir
